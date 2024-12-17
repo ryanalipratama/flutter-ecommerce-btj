@@ -1,8 +1,9 @@
+import 'package:belajarflutter1/halaman/checkout.dart';
 import 'package:flutter/material.dart';
 import 'package:belajarflutter1/Models/cart.dart' as CartModel;
 import 'package:belajarflutter1/Api/cartService.dart';
 import 'package:belajarflutter1/Componen/button-checkout.dart';
-import 'bottom-navigation.dart';
+import 'package:belajarflutter1/halaman/checkout.dart';
 
 class Cart extends StatefulWidget {
   final String? token;
@@ -16,6 +17,8 @@ class Cart extends StatefulWidget {
 class _CartState extends State<Cart> {
   late Future<List<CartModel.Cart>> _cartItems;
   late CartService _cartService;
+
+  List<CartModel.Cart> selectedItems= [];
 
   @override
   void initState() {
@@ -38,14 +41,40 @@ class _CartState extends State<Cart> {
     }
   }
 
-  void checkout() {
-    Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => navigasi(initialIndex: 2),
-        ),
-      );
+   void checkout() {
+  if (selectedItems.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Pilih produk terlebih dahulu!'),
+        backgroundColor: Color.fromARGB(255, 194, 23, 23),
+      ),
+    );
+    return;
   }
+
+  if (widget.token == null || widget.token!.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Token tidak ditemukan!'),
+        backgroundColor: Color.fromARGB(255, 194, 23, 23),
+      ),
+    );
+    return;
+  }
+
+  // Kirim selectedItems dan token ke halaman Checkout
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => Checkout(
+        selectedItems: selectedItems, 
+        token: widget.token,
+      ),
+    ),
+  );
+}
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -88,6 +117,14 @@ class _CartState extends State<Cart> {
                                   onChanged: (newBool) {
                                     setState(() {
                                       cartItem.isChecked = newBool ?? false;
+
+                                      if (cartItem.isChecked) {
+                                        // Tambahkan item yang dipilih ke selectedItems
+                                        selectedItems.add(cartItem);
+                                      } else {
+                                        // Hapus item yang tidak dipilih dari selectedItems
+                                        selectedItems.remove(cartItem);
+                                      }
                                     });
                                   },
                                 ),

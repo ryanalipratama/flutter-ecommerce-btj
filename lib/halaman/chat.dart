@@ -105,7 +105,8 @@ class _ChatPageState extends State<ChatPage> {
         title: Text(
           'Chat Sama Mimin Yuk!',
           style: TextStyle(
-            color: Color.fromARGB(255, 30, 94, 32)
+            color: Color.fromARGB(255, 30, 94, 32),
+            fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,

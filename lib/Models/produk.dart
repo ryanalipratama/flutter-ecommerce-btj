@@ -6,7 +6,7 @@ class Produk {
   final int kategori_id;
   final double harga;
   final String deskripsi;
- double jumlah;
+  final double jumlah;
   final String? gambar;
   final Kategori kategori;
 

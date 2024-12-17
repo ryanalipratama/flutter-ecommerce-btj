@@ -22,9 +22,9 @@ class Cart {
       id: json["id"],
       user_id: json["user_id"],
       produk_id: json["produk_id"],
-      quantity: json["quantity"], // Asumsi quantity di JSON sudah int
+      quantity: json["quantity"],
       produk: Produk.fromJson(json["produk"]),
-      isChecked: false, // Default value untuk isChecked
+      isChecked: false,
     );
   }
 }

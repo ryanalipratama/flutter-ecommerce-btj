@@ -82,8 +82,16 @@ class _RegisterState extends State<Register>{
   @override
   Widget build(BuildContext context) {
     return Scaffold( 
-      appBar: AppBar(),
-
+      appBar: AppBar(
+        title: Text(
+          'Registrasi Akun',
+          style: TextStyle(
+            color: Color.fromARGB(255, 30, 94, 32),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+      ),
       body: 
       SingleChildScrollView(
         child: Center(

@@ -33,14 +33,17 @@ dependencies:
   http: ^1.2.1
   provider: ^6.0.3
   shared_preferences: ^2.0.6
-  image_picker: ^0.8.6
+  image_picker: ^1.1.2
   path: ^1.8.0
   http_parser: ^4.0.0
   mime: ^1.0.0
   carousel_slider: ^4.2.1
-  firebase_core: ^1.10.0
-  firebase_auth: ^3.11.2
-  cloud_firestore: ^3.1.0
+  midtrans_sdk: ^0.4.0
+  intl: ^0.18.0
+  webview_flutter: ^4.8.0
+
+
+
 
 
 
@@ -76,6 +79,7 @@ flutter:
     - asset/2.png
     - asset/profil.jpg
     - asset/btj.png
+    - asset/testgambar.jpg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
