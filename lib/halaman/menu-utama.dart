@@ -9,6 +9,7 @@ import 'package:belajarflutter1/Api/AuthService.dart';
 import 'package:provider/provider.dart';
 import 'package:belajarflutter1/Models/AuthModel.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:intl/intl.dart';
 
 class MenuUtama extends StatefulWidget {
   final String? token;
@@ -113,6 +114,11 @@ class _MenuUtamaState extends State<MenuUtama> {
         }).toList();
       }
     });
+  }
+
+  String formatRupiah(double amount) {
+    final formatCurrency = NumberFormat.simpleCurrency(locale: 'id_ID');
+    return formatCurrency.format(amount);
   }
 
   @override
@@ -374,7 +380,7 @@ class _MenuUtamaState extends State<MenuUtama> {
                                 ),
                                 SizedBox(height: 5), // Jarak antara nama produk dan harga
                                 Text(
-                                  'Rp ${_filteredProduk[index].harga}', // Tampilkan harga produk
+                                  "${formatRupiah( _filteredProduk[index].harga)}",
                                   style: TextStyle(
                                     color: const Color.fromARGB(255, 30, 94, 32),
                                   ),

@@ -206,45 +206,6 @@ class _CheckoutState extends State<Checkout> {
               child: Column(
                 children: [
 
-                  // Id Pengguna
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    color: Color.fromARGB(255, 240, 240, 240),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 20.0, right: 20, bottom: 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 10),
-                          Text(
-                            "Id Pengguna",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(
-                            width: double.infinity, // Menjadikan Card selebar mungkin
-                            child: Card(
-                              elevation: 4,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                              color: Colors.white,
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      idUserController.text,
-                                      style: TextStyle(fontSize: 13),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
                   // Nama 
                   Container(
                     width: MediaQuery.of(context).size.width,

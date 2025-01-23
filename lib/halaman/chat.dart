@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:belajarflutter1/Models/chat.dart';
 import 'package:belajarflutter1/Api/ChatService.dart';
-import 'dart:developer' as developer; // Sesuaikan dengan path yang benar
+import 'dart:developer' as developer;
 
 class ChatPage extends StatefulWidget {
   final String? token;
-  final int userId; // Tambahkan userId untuk menyimpan ID pengguna yang login
+  final int userId; // Menyimpan ID pengguna yang login
 
   const ChatPage({Key? key, this.token, required this.userId}) : super(key: key);
 
@@ -20,6 +20,7 @@ class _ChatPageState extends State<ChatPage> {
   List<Chat> _messages = []; // Daftar pesan
   ChatService _chatService = ChatService();
   final ImagePicker _picker = ImagePicker();
+  String? _fileUrl; // Menyimpan URL file yang dipilih
 
   @override
   void initState() {
@@ -32,19 +33,19 @@ class _ChatPageState extends State<ChatPage> {
     try {
       List<Chat> messages = await _chatService.fetchMessages(widget.token!);
       setState(() {
-        _messages = messages.reversed.toList(); 
+        _messages = messages; // Menyimpan pesan
       });
       _scrollToBottom();
     } catch (e) {
       print('Error fetching messages: $e');
-    }finally {
-    // Lakukan polling lagi setelah 10 detik
-    Future.delayed(Duration(seconds: 10), () {
-      if (mounted) {
-        _fetchMessages(); // Panggil fungsi untuk polling kembali
-      }
-    });
-  }
+    } finally {
+      // Polling setiap 10 detik
+      Future.delayed(Duration(seconds: 3), () {
+        if (mounted) {
+          _fetchMessages();
+        }
+      });
+    }
   }
 
   // Fungsi untuk mengirim pesan baru
@@ -52,36 +53,37 @@ class _ChatPageState extends State<ChatPage> {
     String message = _textController.text.trim();
     if (message.isNotEmpty) {
       try {
-        await _chatService.sendMessage(message, widget.userId, 1, widget.token!); // Gunakan userId dari widget dan id admin adalah 1
-        // Jika pesan terkirim berhasil, tambahkan ke daftar pesan
+        await _chatService.sendMessage(message, widget.userId, 1, widget.token!, _fileUrl);
         setState(() {
-          _messages.insert(
-            0,
+          _messages.add(
             Chat(
-              id: _messages.length + 1, // ID dummy untuk sementara
-              sender_id: widget.userId, 
-              receiver_id: 1, // ID admin sebagai integer
-              sender_type: 'App\\Models\\User', // Tipe sender user sesuai data
-              receiver_type: 'App\\Models\\Admin', // Tipe receiver admin sesuai data
+              id: _messages.length + 1,
+              messageId: message, // ID dummy
+              sender_id: widget.userId,
+              receiver_id: 1, // ID admin
+              sender_type: 'user',
+              receiver_type: 'admin',
               message: message,
               timestamp: DateTime.now(),
+              fileUrl: _fileUrl, // Menyertakan URL file
             ),
           );
         });
-        _textController.clear(); // Hapus teks dari TextField setelah mengirim
+        _textController.clear();
+        _fileUrl = null; // Reset URL file setelah pengiriman
         _scrollToBottom();
       } catch (e) {
-         developer.log('Error sending message: $e', name: 'ChatPage');
-        // Handle error jika diperlukan
+        developer.log('Error sending message: $e', name: 'ChatPage');
       }
     }
   }
 
+  // Fungsi untuk mengatur scroll agar selalu di bawah
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
-          _scrollController.position.minScrollExtent,
+          _scrollController.position.maxScrollExtent,
           duration: Duration(milliseconds: 300),
           curve: Curves.easeOut,
         );
@@ -93,8 +95,9 @@ class _ChatPageState extends State<ChatPage> {
   Future<void> _pickFile() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      // Tambahkan fungsionalitas untuk mengirim file di sini
-      print('Picked file: ${pickedFile.path}');
+      setState(() {
+        _fileUrl = pickedFile.path; // Menyimpan URL file yang dipilih
+      });
     }
   }
 
@@ -116,31 +119,52 @@ class _ChatPageState extends State<ChatPage> {
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
-              reverse: true, // Untuk menampilkan pesan terbaru di bagian bawah
+              reverse: false,
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 Chat message = _messages[index];
+                bool isUserMessage = message.sender_type == 'user';
                 return Padding(
                   padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                   child: Align(
-                    alignment: message.sender_type == 'App\\Models\\Admin'
-                        ? Alignment.centerLeft
-                        : Alignment.centerRight,
+                    alignment: isUserMessage ? Alignment.centerRight : Alignment.centerLeft,
                     child: Container(
                       padding: EdgeInsets.all(12.0),
                       decoration: BoxDecoration(
-                        color: message.sender_type == 'App\\Models\\Admin'
-                            ? Colors.grey[300]
-                            : Color.fromARGB(255, 30, 94, 32),
+                        color: isUserMessage ? Color.fromARGB(255, 30, 94, 32) : Colors.grey[300],
                         borderRadius: BorderRadius.circular(16.0),
                       ),
-                      child: Text(
-                        message.message,
-                        style: TextStyle(
-                          color: message.sender_type == 'App\\Models\\Admin'
-                              ? Colors.black
-                              : Colors.white,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            message.message,
+                            style: TextStyle(
+                              color: isUserMessage ? Colors.white : Colors.black,
+                            ),
+                          ),
+                          // Cek jika ada file
+                          if (message.fileUrl != null && message.fileUrl!.isNotEmpty)
+                            Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: GestureDetector(
+                                onTap: () {
+                                  print('File URL: ${message.fileUrl}');
+                                },
+                                child: Container(
+                                  height: 150,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[300],
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  child: Image.network(
+                                    message.fileUrl!,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   ),
@@ -165,12 +189,12 @@ class _ChatPageState extends State<ChatPage> {
                     decoration: InputDecoration(
                       hintText: 'Type your message...',
                       border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey), // Warna border default
-                        borderRadius: BorderRadius.circular(8.0), // Sudut border yang dibulatkan
+                        borderSide: BorderSide(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color.fromARGB(255, 30, 94, 32)), // Warna border saat aktif (dipencet)
-                        borderRadius: BorderRadius.circular(20.0), // Sudut border yang dibulatkan
+                        borderSide: BorderSide(color: Color.fromARGB(255, 30, 94, 32)),
+                        borderRadius: BorderRadius.circular(20.0),
                       ),
                     ),
                   ),
@@ -178,7 +202,7 @@ class _ChatPageState extends State<ChatPage> {
                 IconButton(
                   icon: Icon(
                     Icons.send,
-                    color: Color.fromARGB(255, 30, 94, 32), // Mengatur warna ikon menjadi hijau
+                    color: Color.fromARGB(255, 30, 94, 32),
                   ),
                   onPressed: _sendMessage,
                 ),

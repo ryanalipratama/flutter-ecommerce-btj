@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:belajarflutter1/Models/produk.dart';
 import 'package:belajarflutter1/Api/CartService.dart';
 import 'package:belajarflutter1/halaman/bottom-navigation.dart';
+import 'package:intl/intl.dart';
 
 class DetailProduk extends StatefulWidget {
   final String token;
@@ -38,6 +39,12 @@ class _DetailProdukState extends State<DetailProduk> {
       // Tambahkan pernyataan atau tindakan lain sesuai kebutuhan jika penambahan ke cart gagal
     }
   }
+  // Format Rupiah
+    String formatRupiah(double amount) {
+      final formatCurrency = NumberFormat.simpleCurrency(locale: 'id_ID');
+      return formatCurrency.format(amount);
+    }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -107,7 +114,7 @@ class _DetailProdukState extends State<DetailProduk> {
                         Padding(
                           padding: const EdgeInsets.only(left: 20, top: 3),
                           child: Text(
-                            'Rp ${widget.produk.harga.toStringAsFixed(0)}',
+                            "${formatRupiah(widget.produk.harga)}",
                             style: TextStyle(
                               color: Colors.white, 
                               fontSize: 35,
@@ -115,18 +122,6 @@ class _DetailProdukState extends State<DetailProduk> {
                             ),
                           ),
                         ),  
-
-                        // Produk Tersisa
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20, top: 5),
-                          child: Text(
-                            'Stok produk ${widget.produk.jumlah.toStringAsFixed(0)}',
-                            style: TextStyle(
-                              color: Colors.white, 
-                              fontSize: 20,
-                            ),
-                          ),
-                        ), 
 
                         // Deskripsi Produk
                         Padding(

@@ -4,6 +4,7 @@ import 'package:belajarflutter1/Models/cart.dart' as CartModel;
 import 'package:belajarflutter1/Api/cartService.dart';
 import 'package:belajarflutter1/Componen/button-checkout.dart';
 import 'package:belajarflutter1/halaman/checkout.dart';
+import 'package:intl/intl.dart';
 
 class Cart extends StatefulWidget {
   final String? token;
@@ -74,7 +75,11 @@ class _CartState extends State<Cart> {
   );
 }
 
-  
+  String formatRupiah(double amount) {
+    final formatCurrency = NumberFormat.simpleCurrency(locale: 'id_ID');
+    return formatCurrency.format(amount);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -156,13 +161,13 @@ class _CartState extends State<Cart> {
                                     Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 10),
                                       child: Text(
-                                        "Rp ${cartItem.produk.harga}",
+                                        "${formatRupiah(cartItem.produk.harga)}",
                                       ),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 10),
                                       child: Text(
-                                        "Total: Rp $totalPrice", // Tampilkan total harga
+                                        "Total: ${formatRupiah(totalPrice)}", // Tampilkan total harga
                                         style: TextStyle(
                                           color: Colors.red,
                                           fontWeight: FontWeight.bold,
